@@ -5,7 +5,7 @@
  * @format
  * @flow strict-local
  */
-
+import MapView from 'react-native-maps';
 import React from 'react';
 import {
   SafeAreaView,
