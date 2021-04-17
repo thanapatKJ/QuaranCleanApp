@@ -1,165 +1,52 @@
-// import React, { Component } from 'react';
-// import { Platform, StyleSheet, Text, View } from 'react-native';
-// import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-// export default
-// class App extends React.Component {
-//   render() {
-//     return (
-//       <MapView
-//          style={{ flex: 1 }}
-//          provider={PROVIDER_GOOGLE}
-//          showsUserLocation
-//          initialRegion={{
-//          latitude: 13.819340046771346,
-//          longitude: 100.5141860734398,
-//          latitudeDelta: 0.0922,
-//          longitudeDelta: 0.0421}}
-//       />
-//     );
-//   }
-// }
-
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Dimensions,
-  TouchableOpacity,
-} from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-import MapView, { Marker, ProviderPropType, Circle } from 'react-native-maps';
 
-const { width, height } = Dimensions.get('window');
+import Register from './Screens/Register';
+import Login from './Screens/Login';
+import Profile from './Screens/Profile';
+import ChangePassword from './Screens/ChangePassword';
+import Home from './Screens/Home';
+import QuarantinePlace from './Screens/QuarantinePlace';
+import Verify from './Screens/Verify';
 
-const ASPECT_RATIO = width / height;
-const LATITUDE = 37.78825;
-const LONGITUDE = -122.4324;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-let id = 0;
+const navOptionHandler = () => ({
+  headerShown: false
+})
+const ProfileStack = createStackNavigator();
 
-function randomColor() {
-  return `#${Math.floor(Math.random() * 16777215)
-    .toString(16)
-    .padStart(6, 0)}`;
-}
-
-class DefaultMarkers extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      region: {
-        latitude: LATITUDE,
-        longitude: LONGITUDE,
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA,
-      },
-      markers: [],
-    };
-  }
-
-  onMapPress(e) {
-    this.setState({
-      markers: [
-        ...this.state.markers,
-        {
-          coordinate: e.nativeEvent.coordinate,
-          key: id++,
-          color: randomColor(),
-        },
-      ],
-    });
-  }
-
-  render() {
+function ProfileNavigator(){
     return (
-      <View style={styles.container}>
-        <MapView
-          provider={this.props.provider}
-          style={styles.map}
-          initialRegion={{
-          latitude: 13.819340046771346,
-          longitude: 100.5141860734398,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421}}
-          onPress={e => this.onMapPress(e)}
-        >
-        <Circle center={{
-          latitude: 13.819340046771346,
-          longitude: 100.5141860734398,
-        }} radius= {100} fillColor={'#801515'} />
-          {/* {this.state.markers.map(marker => (
-            <Marker
-              key={marker.key}
-              coordinate={{
-              latitude: 13.819340046771346,
-              longitude: 100.5141860734398,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421}}
-              pinColor={marker.color}
-            />
-            
-          ))} */}
-            <Marker
-              // key={marker.key}
-              coordinate={{
-              latitude: 13.819340046771346,
-              longitude: 100.5141860734398,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421}}
-              pinColor={'#801515'}
-            />
-          
-        </MapView>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => this.setState({ markers: [] })}
-            style={styles.bubble}
-          >
-            <Text>Tap to create a marker of random color</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
+        <ProfileStack.Navigator initialRouteName="Profile">
+            <ProfileStack.Screen name="Profile" component={Profile} options={navOptionHandler}/>
+            <ProfileStack.Screen name="ChangePassword" component={ChangePassword}/>
+        </ProfileStack.Navigator>
+    )
 }
+const Tab = createBottomTabNavigator();
 
-DefaultMarkers.propTypes = {
-  provider: ProviderPropType,
-};
+function AppTab(){
+    return (
+        <Tab.Navigator initialRouteName="Home">
+            <Tab.Screen name="Home" component={Home}/>
+            <Tab.Screen name="Place" component={QuarantinePlace}/>
+            <Tab.Screen name="Verify" component={Verify}/>
+            <Tab.Screen name="Profile" component={ProfileNavigator}/>
+        </Tab.Navigator>
+    )
+}
+const StackApp = createStackNavigator();
 
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  bubble: {
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  latlng: {
-    width: 200,
-    alignItems: 'stretch',
-  },
-  button: {
-    width: 80,
-    paddingHorizontal: 12,
-    alignItems: 'center',
-    marginHorizontal: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginVertical: 20,
-    backgroundColor: 'transparent',
-  },
-});
-
-export default DefaultMarkers;
+export default function App() {
+    return (
+        <NavigationContainer>
+            <StackApp.Navigator initialRouteName="Login">
+                <StackApp.Screen name="Login" component={Login} options={navOptionHandler}/>
+                <StackApp.Screen name="Register" component={Register}/>
+                <StackApp.Screen name="Tab" component={AppTab} options={navOptionHandler}/>
+            </StackApp.Navigator>
+        </NavigationContainer>
+    );
+}
