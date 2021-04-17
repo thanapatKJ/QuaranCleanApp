@@ -6,9 +6,26 @@ import Header from '../components/Header';
 export default class QuarantinePlace extends Component {
   constructor(props){
     super(props);
+
+    this.state = {
+      name:"",
+      lati:"",
+      longi:"",
+      detail:"",
+    }
   }
   sendPlaceData = () => {
-    Alert.alert("SendPlaceData");
+    fetch('http://localhost:8000/api/place_api/',{
+      method: 'POST',
+      body:JSON.stringify({
+        "name":this.state.name,
+        "lati":this.state.lati,
+        "longi":this.state.longi,
+        "detail":this.state.detail,
+      })
+    }).then((response)=>Alert.alert(JSON.stringify(response.json())))
+    .then(()=>Alert.alert("Sent Data"))
+    .catch((error)=>{Alert.alert(error.message)})
   }
   render(){
     return(
@@ -18,22 +35,24 @@ export default class QuarantinePlace extends Component {
         <TextInput
             style={styles.input}
             placeholder="Name"
+            onChangeText={(text)=>this.setState({name:text})}
           />
           <TextInput
             style={styles.input}
             placeholder="Latitude"
             keyboardType="numeric"
-
+            onChangeText={(text)=>this.setState({lati:text})}
           />
           <TextInput
             style={styles.input}
             placeholder="Longtitude"
             keyboardType="numeric"
-
+            onChangeText={(text)=>this.setState({longi:text})}
           />
           <TextInput
             style={styles.input}
             placeholder="Detail"
+            onChangeText={(text)=>this.setState({detail:text})}
           />
           <Button title="Confirm" onPress={this.sendPlaceData} />
     </SafeAreaView>
