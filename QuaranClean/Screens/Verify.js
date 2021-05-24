@@ -5,13 +5,21 @@ import Header from '../components/Header';
 
 
 export default class Verify extends Component {
+  constructor(props){
+    super(props);
+  }
+  sendVerify = () => {
+    Alert.alert("Send Verify Signal to server")
+  }
   render(){
     return(
     <SafeAreaView>
       <Header />
       <Text style={styles.title}>Verify</Text>
-      <Text style={styles.title}>20:00</Text>
-      <Button title="Press To Verify"/>
+      <Text style={styles.title}>Next time 20:00</Text>
+      <Button 
+        title="Press To Verify"
+        onPress={this.sendVerify}/>
     </SafeAreaView>
     );
   }

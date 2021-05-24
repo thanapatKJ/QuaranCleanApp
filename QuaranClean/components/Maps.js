@@ -18,6 +18,8 @@
 //     );
 //   }
 // }
+import { request, PERMISSIONS } from 'react-native-permissions';
+import Geolocation from '@react-native-community/geolocation';
 import React, { Component } from 'react';
 import {
   StyleSheet,
@@ -25,9 +27,11 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 
-import MapView, { Marker, ProviderPropType, Circle } from 'react-native-maps';
+import MapView, {PROVIDER_GOOGLE, Marker, ProviderPropType, Circle } from 'react-native-maps';
+import { Alert } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -70,45 +74,56 @@ class DefaultMarkers extends Component {
       ],
     });
   }
+  componentDidMount(){
+    this.requestLocationPermission();
+  }
+  requestLocationPermission = async () => {
+    if(Platform.OS === 'ios'){
+      var response = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      console.log('iPhone: ' + response);
+      if(response === 'granted'){
+        this.locateCurrentPosition();
+      }
+    }else{
+      var response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+      console.log('Android: ' + response);
+      if(response === 'granted'){
+        this.locateCurrentPosition();
+      }
+    }
+  }
+  locateCurrentPosition = () => {
+    Geolocation.getCurrentPosition(
+      position =>{
+        console.log(JSON.stringify(position));
+        let initialPosition = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          // latitudeDelta: 0.0922,
+          // longitudeDelta: 0.0421,
+          latitudeDelta: 0.09,
+          longitudeDelta: 0.035,
+        }
+        this.setState({initialPosition});
+      },error => Alert.alert(error.message),
+      {enableHighAccuracy: true, timeout: 10000, maximumAge: 1000 }
 
+    )
+  }
   render() {
     return (
       <View style={styles.container}>
         <MapView
-          provider={this.props.provider}
+          provider={PROVIDER_GOOGLE}
+          ref={map => this._map=map}
+          showsUserLocation={true}
           style={styles.map}
-          initialRegion={{
-          latitude: 13.819340046771346,
-          longitude: 100.5141860734398,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421}}
-          onPress={e => this.onMapPress(e)}
+          initialRegion={this.state.initialPosition}
         >
         <Circle center={{
-          latitude: 13.819340046771346,
-          longitude: 100.5141860734398,
-        }} radius= {100} fillColor={'#801515'} />
-          {/* {this.state.markers.map(marker => (
-            <Marker
-              key={marker.key}
-              coordinate={{
-              latitude: 13.819340046771346,
-              longitude: 100.5141860734398,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421}}
-              pinColor={marker.color}
-            />
-            
-          ))} */}
-            <Marker
-              // key={marker.key}
-              coordinate={{
-              latitude: 13.819340046771346,
-              longitude: 100.5141860734398,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421}}
-              pinColor={'#801515'}
-            />
+          latitude: 13.72799389329322,
+          longitude: 100.54987037054882,
+        }} radius= {5} fillColor={'rgba(200,300,200,0.5)'} />
           
         </MapView>
         <View style={styles.buttonContainer}>

@@ -1,8 +1,25 @@
 import React, { Component } from 'react';
-import { StyleSheet, Button, View, SafeAreaView, Text, Alert,TextInput } from 'react-native';
+import { StyleSheet, Button, View, SafeAreaView, Text, Alert,TextInput, TextComponent } from 'react-native';
 
 export default class ChangePassword extends Component {
+  constructor(props){
+    super(props);
+    this.state  = {
+      Opassword:"",
+      Cpassword:"",
+      Npassword:"",
+    }
+  }
   sendChangePassword = () => {
+    if(this.state.Npassword==this.state.Cpassword){
+      fetch('http://localhost:8000/api/user_id',{
+        method:'PATCH',
+        body:JSON.stringify({
+          "oldPassword": this.state.Opassword,
+          "newPasword":this.state.Npassword,
+        })
+      })
+    }    
     Alert.alert("ChangePassword")
     this.props.navigation.navigate('Profile');
   }
@@ -13,14 +30,17 @@ export default class ChangePassword extends Component {
         <TextInput style={styles.input}
           placeholder="Old Password"
           secureTextEntry={true}
+          onChangeText={(text)=> this.setState({Opassword})}
         />
         <TextInput style={styles.input}
           placeholder="New Password"
           secureTextEntry={true}
+          onChangeText={(text)=> this.setState({Npassword})}
         />
         <TextInput style={styles.input}
           placeholder="Confirm New Password"
           secureTextEntry={true}
+          onChangeText={(text)=>this.setState({Cpassword})}
         />
         <Button title="Confirm" onPress={this.sendChangePassword}/>
     </View>
